@@ -1,4 +1,4 @@
-# PSXLib
+<img align="left" alt="controller" src="https://github.com/gecko0307/psxlib/raw/master/media/controller.png" height="66" />
 
 PSXLib is a library for homebrew PlayStation 1 development. This project aims to implement fully free and open replacement to proprietary standard library from Psy-Q SDK. It doesn't provide its own MIPS toolchain though, it is meant to be used with Psy-Q CCPSX compiler and corresponding tools.
 
