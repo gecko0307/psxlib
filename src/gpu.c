@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include "gpu.h"
-#include "specfont.h"
+#include "font.h"
 
 typedef volatile long * vptr;
 

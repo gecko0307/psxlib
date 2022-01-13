@@ -22,12 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "gpu.h"
-#include "pad.h"
+#include "psxlib.h"
 #include "cd.h"
-#include "stdio.h"
 
-// set up 2 OTs (one for each buffer), each 2000 bytes long
+// Two OTs (one for each buffer), each 2000 bytes long
 unsigned char orderingTable[2][2000];
 
 int spriteFromImage(GpuSprite* s, GpuImage* img, int x, int y, int u, int v, int w, int h)
