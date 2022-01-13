@@ -2,12 +2,12 @@
 <iso_project image_name="build/game.bin" cue_sheet="build/game.cue">
 	<track type="data">
 		<identifiers
-			system			="PLAYSTATION"
-			application		="PLAYSTATION"
-			volume			="GAME"
-			volume_set		="GAME"
-			publisher		="GECKO"
-			data_preparer	="MKPSXISO"
+			system ="PLAYSTATION"
+			application ="PLAYSTATION"
+			volume ="GAME"
+			volume_set ="GAME"
+			publisher ="GECKO"
+			data_preparer ="MKPSXISO"
 		/>
 		<license file="licenses/infoeur.dat"/>
 		<directory_tree>
