@@ -26,5 +26,7 @@ The library from Psy-Q is a closed-source abandonware, so it can't be patched or
 ## Usage
 A simple usage example can be found in the `demo` folder. Keep in mind that this repository doesn't contain third-party utilities needed to build it. You can download a prepackaged version for Windows from Releases page, but you still need to install Psy-Q SDK by yourself.
 
+[![Demo](https://raw.githubusercontent.com/gecko0307/psxlib/main/media/demo.png)](https://raw.githubusercontent.com/gecko0307/psxlib/main/media/controller.png)
+
 ## License
 PSXLib is distributed under the MIT license.

@@ -9,4 +9,4 @@ To build the demo, you need the following tools:
 
 Under Windows, given all the tools are in PATH, and Psy-Q is installed in `C:\psyq`, ready-to-run disk image (`build/game.bin` + `build/game.cue`) can be created by running `build.bat` script.
 
-To run the demo, you need a PlayStation emulator. Recommended Open Source emulators are [RetroArch](https://www.retroarch.com/) with [PCSX ReARMed core](https://github.com/notaz/pcsx_rearmed) and [DuckStation](https://github.com/stenzek/duckstation).
+To run the demo, you need a PlayStation emulator. Recommended Open Source emulators are [RetroArch](https://www.retroarch.com/) with [PCSX ReARMed core](https://github.com/notaz/pcsx_rearmed) and [DuckStation](https://github.com/stenzek/duckstation). With DuckStation, it is advisable to run with Information log level to see TTY output in the console.
