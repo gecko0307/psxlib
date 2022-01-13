@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iso_project image_name="build/game.bin" cue_sheet="build/game.cue">
+	<track type="data">
+		<identifiers
+			system			="PLAYSTATION"
+			application		="PLAYSTATION"
+			volume			="GAME"
+			volume_set		="GAME"
+			publisher		="GECKO"
+			data_preparer	="MKPSXISO"
+		/>
+		<license file="licenses/infoeur.dat"/>
+		<directory_tree>
+			<file name="PSX.EXE" type="data" source="iso/PSX.EXE"/>
+			<file name="IMG.TIM" type="data" source="iso/IMG.TIM"/>
+			<dummy sectors="1024"/>
+		</directory_tree>
+	</track>
+</iso_project>
