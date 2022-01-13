@@ -16,3 +16,6 @@ Currently PSXLib contains only the most basic functionality:
 PSXLib API doesn't imitate Psy-Q one-to-one. I tried to design it in simpler and more consistent manner. Some functions are inspired by Blade's PSX library.
 
 PSXLib is written in ANSI C with pieces in ASPSX assembler.
+
+## Usage
+A simple usage example can be found in the `demo` folder. Keep in mind that this repository doesn't contain third-party utilities needed to build it.
