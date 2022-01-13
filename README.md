@@ -18,4 +18,4 @@ PSXLib API doesn't imitate Psy-Q one-to-one. I tried to design it in simpler and
 PSXLib is written in ANSI C with pieces in ASPSX assembler.
 
 ## Usage
-A simple usage example can be found in the `demo` folder. Keep in mind that this repository doesn't contain third-party utilities needed to build it.
+A simple usage example can be found in the `demo` folder. Keep in mind that this repository doesn't contain third-party utilities needed to build it. You can download a prepackaged version for Windows from Releases page, but you still need to install Psy-Q SDK by yourself.
