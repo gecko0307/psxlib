@@ -233,7 +233,7 @@ addiu $r, $0, imm
 
 - `nop` - Same as `sll $0, $0, 0`.
 
-## COP1 - System Control Coprocessor
+## COP0 - System Control Coprocessor
 
 COP0 registers:
 - `$0` - N/A
