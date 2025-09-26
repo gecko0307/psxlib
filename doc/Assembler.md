@@ -278,7 +278,9 @@ nop
 
 GTE load and store instructions have a delay of 2 instructions, for any GTE commands or operations accessing that register.
 
-GTE data registers (accessed via `mfc2` / `mtc2`):
+### GTE Registers
+
+Data registers (accessed via `mfc2` / `mtc2`):
 - `$0` - VXY0  - Vector0 X and Y, 2 packed signed 16-bit integers
 - `$1` - VZ0   - Vector0 Z, signed 16-bit integer
 - `$2` - VXY1  - Vector1 X and Y, 2 packed signed 16-bit integers
@@ -314,12 +316,14 @@ GTE data registers (accessed via `mfc2` / `mtc2`):
 
 The SXYn, SZn and RGBn are first-in-first-out registers (FIFO). The last calculation result is stored in the last register, and previous results are stored in previous registers. So for example when a new SXY value is obtained the following happens:
 
+```
 SXY0 = SXY1
 SXY1 = SXY2
 SXY2 = SXYP
 SXYP = result
+```
 
-GTE control registers (accessed via `cfc2` / `ctc2`):
+Control registers (accessed via `cfc2` / `ctc2`):
 - `$0`  - R11R12 - Rotation matrix 3x3 (r11, r12), 2 signed 16-bit integers
 - `$1`  - R13R21 - Rotation matrix 3x3 (r13, r21), 2 signed 16-bit integers
 - `$2`  - R22R23 - Rotation matrix 3x3 (r22, r23), 2 signed 16-bit integers
@@ -353,22 +357,9 @@ GTE control registers (accessed via `cfc2` / `ctc2`):
 - `$30` - ZSF4   - Z-averaging scale factor, signed 16-bit integer
 - `$31` - FLAG   - Flag (read-only), returns any calculation errors, 20 bits
 
-GTE Command encoding:
+### GTE Commands
 
-31-25  Must be 0100101b for "COP2 imm25" instructions
-20-24  Fake GTE Command Number (00h..1Fh) (ignored by hardware)
-19     sf - Shift Fraction in IR registers (0=No fraction, 1=12bit fraction)
-17-18  MVMVA Multiply Matrix    (0=Rotation. 1=Light, 2=Color, 3=Reserved)
-15-16  MVMVA Multiply Vector    (0=V0, 1=V1, 2=V2, 3=IR/long)
-13-14  MVMVA Translation Vector (0=TR, 1=BK, 2=FC/Bugged, 3=None)
-11-12  Always zero                        (ignored by hardware)
-10     lm - Saturate IR1,IR2,IR3 result (0=To -8000h..+7FFFh, 1=To 0..+7FFFh)
-6-9    Always zero                        (ignored by hardware)
-0-5    Real GTE Command Number (00h..3Fh) (used by hardware)
-
-GTE Commands:
-
-### RTPS
+#### RTPS
 `cop2 0x0180001` - Rotate, Translate, Perpective Transformation of 1 point. The point is first multiplied with a rotation matrix (R), and after that translated (TR). Finally a perspective transformation is applied, which results in screen coordinates. It also returns an interpolation value to be used with the various depth cueing instructions.
 
 Input:
@@ -385,52 +376,52 @@ Output:
 
 Z values are limited downwards at 0.5 * H. For smaller z values you'll have write your own routine.
 
-### RTPT
+#### RTPT
 `cop2 0x0280030` - Rotate, Translate, Perpective Transformation of 3 points.
 
-### MVMVA
+#### MVMVA
 `cop2 0x0400012` - Matrix-Vector Multiplication and Addition. Multiplies a vector with either the rotation matrix, the light matrix or the color matrix and then adds the translation vector or background color vector.
 
-### DCPL
+#### DCPL
 `cop2 0x0680029` - Depth Cue Light Color. First calculates a color from a light vector (normal vector of a plane multiplied with the light matrix and zero limited) and a provided RGB value. Then performs depth cueing by interpolating between the far color vector and the newfound color.
 
-### DPCS
+#### DPCS
 `cop2 0x0780010` - Depth Cue Single/Triple. Performs depth cueing by interpolating between a color and the far color (on one color).
 
-### DPCT
+#### DPCT
 `cop2 0x0f8002a` - Depth Cue Single/Triple. Performs depth cueing by interpolating between a color and the far color (on three colors).
 
-### INTPL
+#### INTPL
 `cop2 0x0980011` - Interpolation. Interpolates between a vector and the far color.
 
-### SQR
+#### SQR
 `cop2 0x0a00428` - Square. Calculates the square of a vector.
 
-### NCS
+#### NCS
 `cop2 0x0c8041e` - Normal Color. Calculates a color from the normal of a point or plane and the light sources and colors. The basic color of the plane or point the normal refers to is assumed to be white.
 
-### NCT
+#### NCT
 `cop2 0x0d80420` - 
 
-### NCDS
+#### NCDS
 `cop2 0x0e80413` - Normal Color Depth Cue. Same as `NCS` but also performs depth cueing (like `DPCS`).
 
-### NCDT
+#### NCDT
 `cop2 0x0f80416` - Normal Color Depth Cue. Same as `NCT` but also performs depth cueing (like `DPCT`).
 
-### NCCS
+#### NCCS
 `cop2 0x108041b` - Same as `NCS`, but the base color of the plane or point is taken into account.
 
-### NCCT
+#### NCCT
 `cop2 0x118043f` - Same as `NCT`, but the base color of the plane or point is taken into account.
 
-### CDP
+#### CDP
 `cop2 0x1280414` - A color is calculated from a light vector (base color is assumed to be white) and depth cueing is performed (like DPCS).
 
-### CC
+#### CC
 `cop2 0x138041c` - A color is calculated from a light vector and a base color.
 
-### NCLIP
+#### NCLIP
 `cop2 0x1400006` - Normal Clipping. Calculates the outer product of three 2D points (i.e. 3 vertices which define a plane after projection).
 
 The 3 vertices should be stored clockwise according to the visual point:
@@ -444,19 +435,19 @@ The 3 vertices should be stored clockwise according to the visual point:
 
 If this is so, the result of this function will be negative if we are facing the backside of the plane.
 
-### AVSZ3
+#### AVSZ3
 `cop2 0x158002d` - Z-Averaging. Adds 3 Z values together and multplies them by a fixed point value. This value is normally chosen so that this function returns the average of the Z values (usually further divided by 2 or 4 for easy adding to the OT).
 
-### AVSZ4
+#### AVSZ4
 `cop2 0x168002e` - Z-Averaging. Adds 4 Z values together and multplies them by a fixed point value. This value is normally chosen so that this function returns the average of the Z values (usually further divided by 2 or 4 for easy adding to the OT).
 
-### OP
+#### OP
 `cop2 0x170000c` - Calculates the outer product of 2 vectors.
 
-### GPF
+#### GPF
 `cop2 0x190003d` - Multiplies two vectors. Also returns the result as 24-bit RGB value.
 
-### GPL
+#### GPL
 `cop2 0x1a0003e` - Multiplies a vector with a scalar and adds the result to another vector. Also returns the result as 24-bit RGB value.
 
 
