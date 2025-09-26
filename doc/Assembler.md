@@ -170,7 +170,7 @@ if ($r == $a) {
 - `bne $r, $a, imm` - Branch on Not Equal. Jumps to target constant address `imm`, if `$r != $a`:
 
 ```
-`if ($r = $a) {
+if ($r = $a) {
     pc += 4 + (imm << 2)`
 }
 ```
@@ -178,7 +178,7 @@ if ($r == $a) {
 - `bgez $r, imm` - Branch if Greater Than or Equal to Zero. Jumps to target constant address `imm`, if `$r >= 0`:
 
 ```
-`if ($r >= 0) {
+if ($r >= 0) {
     pc += 4 + (imm << 2)`
 }
 ```
@@ -186,7 +186,7 @@ if ($r == $a) {
 - `bltz $r, imm` - Branch on Less Than Zero. Jumps to target constant address `imm`, if `$r < 0`.
 
 ```
-`if ($r < 0) {
+if ($r < 0) {
     pc += 4 + (imm << 2)`
 }
 ```
@@ -202,10 +202,12 @@ if ($r >= 0) {
 
 - `bltzal $r, imm` - Branch if Less Than Zero And Link. Same as `bltz`, but also stores return address in `$31`.
 
+```
 if ($r < 0) {
     $31 = pc + 8
     pc += 4 + (imm << 2)
 }
+```
 
 ### Pseudo-instructions:
 - `li $r, imm` - Load Immediate. Loads a register with a value that is immediately available.
