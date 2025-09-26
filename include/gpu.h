@@ -51,12 +51,14 @@ typedef struct
     short h;
 } Rect;
 
-typedef struct {
+typedef struct
+{
     unsigned long id;
     unsigned long flag;
 } TIMHeader;
 
-typedef struct {
+typedef struct
+{
     unsigned long datalen;
     unsigned long vrampos;
     unsigned long size;
@@ -73,16 +75,16 @@ typedef struct
 
 typedef struct
 {
-  Rect clip;
-  short ofs[2];
-  Rect tw;
-  unsigned char tpage;
-  unsigned short dtd;
-  unsigned short dfe;
-  unsigned char isbg;
-  unsigned char r0;
-  unsigned char g0;
-  unsigned char b0;
+    Rect clip;
+    short ofs[2];
+    Rect tw;
+    unsigned char tpage;
+    unsigned short dtd;
+    unsigned short dfe;
+    unsigned char isbg;
+    unsigned char r0;
+    unsigned char g0;
+    unsigned char b0;
 } DrawEnv;
 
 typedef struct
@@ -125,13 +127,65 @@ typedef struct
     long trans;
 } GpuSprite;
 
-// x-res = horizontal resolution (256/320/384/512/640)
-// y-res = vertical (240/480 NTSC, 256,512 PAL)
+typedef struct
+{
+    unsigned char r, g, b, p;
+    short x0, y0;
+    short x1, y1;
+    short x2, y2;
+    long trans;
+} GpuPoly3;
+
+typedef struct
+{
+    unsigned char r0, g0, b0, p0;
+    short x0, y0;
+    unsigned char r1, g1, b1, p1;
+    short x1, y1;
+    unsigned char r2, g2, b2, p2;
+    short x2, y2;
+    long trans;
+} GpuGPoly3;
+
+typedef struct
+{
+    unsigned char r, g, b, p0;
+    short x0, y0;
+    unsigned char u0, v0;
+    unsigned short clutid;
+    short x1, y1;
+    unsigned char u1, v1;
+    unsigned short tpage;
+    short x2, y2;
+    unsigned char u2, v2;
+    unsigned short pad2;
+    long trans;
+} GpuTPoly3;
+
+typedef struct
+{
+    unsigned char r0, g0, b0, p0;
+    short x0, y0;
+    unsigned char u0, v0;
+    unsigned short clutid;
+    unsigned char r1, g1, b1, p1;
+    short x1, y1;
+    unsigned char u1, v1;
+    unsigned short tpage;
+    unsigned char r2, g2, b2, p2;
+    short x2, y2;
+    unsigned char u2, v2;
+    unsigned short pad2;
+    long trans;
+} GpuGTPoly3;
+
+// width = horizontal resolution (256/320/384/512/640)
+// height = vertical resolution (240/480 NTSC, 256,512 PAL)
 // vmode = VMODE_NTSC, VMODE_PAL, or VMODE_AUTO
-// intl = bit 0 - interlace flag (0:off, 1:on)
-// dither = dither flag (0:off, 1:on)
-// vram = frame buffer mode (0:16bit, 1:24bit)
-void gpuInit(int dw, int dh, int vmode, int intl, int dither, int vram);
+// interlace = interlace flag (0 = off, 1 = on)
+// dither = dither flag (0 = off, 1 = on)
+// vram = frame buffer mode (0 = 16-bit, 1 = 24-bit)
+void gpuInit(int width, int height, int vmode, int interlace, int dither, int vram);
 
 DrawEnv* gpuPutDrawEnv(DrawEnv* env);
 DispEnv* gpuPutDispEnv(DispEnv* env);
@@ -147,12 +201,17 @@ void gpuPrintStr(unsigned char fontNum, int x, int y, char* fmt);
 
 int gpuGetActiveBuffer(void);
 void gpuSetWorkBase(unsigned char * queueAddr);
-void gpuDraw(unsigned long * pGP);
-void gpuSwapBuffers(void);
 
 void gpuSortClear(int r, int g, int b);
 void gpuSortDot(GpuDot* dot);
 void gpuSortLine(GpuLine* line);
 void gpuSortSprite(GpuSprite* sprite);
+void gpuSortPoly3(GpuPoly3* poly);
+void gpuSortGPoly3(GpuGPoly3* poly);
+void gpuSortTPoly3(GpuTPoly3* poly);
+void gpuSortGTPoly3(GpuGTPoly3 *poly);
+
+void gpuSwapBuffers(void);
+void gpuDraw(unsigned long* pGP);
 
 #endif

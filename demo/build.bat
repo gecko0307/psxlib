@@ -12,7 +12,7 @@ set G032TMP=C:\WINDOWS\TEMP
 set TMPDIR=C:\WINDOWS\TEMP
 
 echo -- Building CPE...
-ccpsx -Xo$80010000 -O0 -I..\include ..\src\sys.s ..\src\pad.c ..\src\gpu.c src\cd.c src\main.c -ocpe\main.cpe
+ccpsx -Xo$80010000 -O0 -I..\include -I..\src ..\src\sys.s ..\src\gte.s ..\src\pad.c ..\src\gpu.c src\cd.c src\test.s src\main.c -ocpe\main.cpe
 
 echo -- Converting to PSX EXE...
 cpe2psx cpe/main.cpe iso/PSX.EXE

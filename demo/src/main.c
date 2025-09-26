@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 Timur Gafarov
+Copyright (c) 2022-2025 Timur Gafarov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,9 @@ int spriteFromImage(GpuSprite* s, GpuImage* img, int x, int y, int u, int v, int
     return 0;
 }
 
+// Just a little test, tinkering with GTE
+int gte_rtps_test(void);
+
 int main(void)
 {
     int activeBuffer;
@@ -57,10 +60,23 @@ int main(void)
     int numFrames = 6;
     float animTimer = 0.0f;
     unsigned long padBtn;
+    int gteResult;
+    short sx, sy;
+    float fsx, fsy;
     
     GpuImage img;
     GpuSprite sprite;
     Data imgData;
+    
+    GpuPoly3 poly;
+    poly.r = 255;
+    poly.g = 255;
+    poly.b = 255;
+    poly.p = 255;
+    poly.x0 = 0; poly.y0 = 0;
+    poly.x1 = 32; poly.y1 = 0;
+    poly.x2 = 32; poly.y2 = 32;
+    poly.trans = 255;
     
     cdInit();
     gpuInit(320, 256, VMODE_PAL, 1, 1, 0);
@@ -74,6 +90,14 @@ int main(void)
     spriteFromImage(&sprite, &img, 20, 50, 0, 0, 32, 32);
     
     printf("numFrames: %d\n", numFrames);
+    
+    gte_enable();
+    gteResult = gte_rtps_test();
+    printf("gteResult = 0x%08X\n", gteResult);
+    sx = gteResult & 0xFFFF;         // Screen X
+    sy = (gteResult >> 16) & 0xFFFF; // Screen Y
+    printf("SX = %hi\n", sx);
+    printf("SY = %hi\n", sy);
     
     while(1)
     {
@@ -104,6 +128,7 @@ int main(void)
         
         sprite.u = 32 * frame;
         gpuSortSprite(&sprite);
+        //gpuSortPoly3(&poly);
         gpuSwapBuffers();
         gpuDraw((unsigned long*)&orderingTable[activeBuffer][0]);
         padWaitVSync();

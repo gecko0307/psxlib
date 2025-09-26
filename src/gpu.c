@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 Timur Gafarov
+Copyright (c) 2022-2025 Timur Gafarov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include "gpu.h"
-#include "font.h"
+#include "specfont.h"
 
 typedef volatile long * vptr;
 
@@ -161,12 +161,12 @@ void gpuInit(int dw, int dh, int vmode, int intl, int dither, int vram)
 
 DrawEnv* gpuPutDrawEnv(DrawEnv* env)
 {
-    GP_SendGPU0(0xe1000200); // drawing mode
-    GP_SendGPU0(0xe2000000); // texture window settings
-    GP_SendGPU0(0xe3000000 | env->clip.y << 10 | env->clip.x);	// clip area start and end
+    GP_SendGPU0(0xe1000200); /* drawing mode */
+    GP_SendGPU0(0xe2000000); /* texture window settings */
+    GP_SendGPU0(0xe3000000 | env->clip.y << 10 | env->clip.x); /* clip area start and end */
     GP_SendGPU0(0xe4000000 | (env->clip.h + env->clip.y) << 10 | (env->clip.w + env->clip.x));
-    GP_SendGPU0(0xe5000000); // drawing offset env->ofs[0]  env->ofs[1]
-    GP_SendGPU0(0xe6000000); // mask settings
+    GP_SendGPU0(0xe5000000); /* drawing offset env->ofs[0]  env->ofs[1] */
+    GP_SendGPU0(0xe6000000); /* mask settings */
     return env;
 }
 
@@ -174,20 +174,20 @@ DispEnv* gpuPutDispEnv(DispEnv* env)
 {
     unsigned long x0, y0, x1, y1;
 
-    // display offset
+    /* display offset */
     gp1 = (0x05000000 | (env->disp.y << 10) | (env->disp.x & 0xffff));
 
-    // horizontal screen start/end
+    /* horizontal screen start/end */
     x0 = env->screen.x *10 + 608;
     x1 = ((env->screen.x + 256) *10) + 608;
     gp1 = (0x06000000 | x1 << 12 | x0);
 
-    // vertical screen start/end
+    /* vertical screen start/end */
     y0 = env->screen.y + 16 + (3 * __videoMode);
     y1 = y0 + 240;
     gp1 = (0x07000000 | y1 << 10 | y0);
 
-    // display mode
+    /* display mode */
     switch (env->disp.w)
     {
         case 256: x0 = ENV_W256; break;
@@ -212,7 +212,7 @@ void gpuFontLoad(unsigned char fontNum, TIMHeader* newFont)
     gpuImageGetInfo(newFont, &__font[fontNum]);
     gpuImageUpload(&__font[fontNum]);
     
-    // set RGB to mid values
+    /* set RGB to mid values */
     __fontColor[fontNum] = 0x74808080;
     __fontWidth[fontNum] = 0;
     __fontHeight[fontNum] = 0;
@@ -277,33 +277,33 @@ void gpuImageGetInfo(TIMHeader* tim, GpuImage* img)
     TIMData *pixel = NULL;
     unsigned long *pp = NULL;
 
-    // get the color mode
+    /* get the color mode */
     img->pmode = (tim->flag & 0x03);
     
-    if ((tim->flag & 0x08) == 0) { // there is no CLUT
+    if ((tim->flag & 0x08) == 0) { /* there is no CLUT */
         pixel = (TIMData*)++tim;
         img->clutid = 0;
     }
-    else { // there is a clut
+    else { /* there is a clut */
         clut = (TIMData*)++tim;
         img->clutid = ((clut->vrampos >> 10) | (clut->vrampos & 0xffff) >> 4);
         pp = (unsigned long *)clut + (clut->datalen >> 2);
         pixel = (TIMData*)pp;
     }
     
-    // x/y address of pixel data
+    /* x/y address of pixel data */
     img->px = (pixel->vrampos & 0xffff);
     img->py = (pixel->vrampos >> 16);
     
-    // tpage number
+    /* tpage number */
     img->tpage = ((img->py & 0x100) >> 4) | ((img->px & 0x3ff) >> 6) | ((img->py & 0x200) << 2);
     img->tpage = ((img->pmode << 7) | img->tpage);
     
-    img->px %= 64; // x/y offset within tpage
+    img->px %= 64; /* x/y offset within tpage */
     if (img->py > 255)
         img->py -= 256;
     
-    img->pw = (pixel->size & 0xffff) << (2 - img->pmode); // width/height of pixel data
+    img->pw = (pixel->size & 0xffff) << (2 - img->pmode); /* width/height of pixel data */
     img->ph = (pixel->size >> 16);
     
     img->clut = clut;
@@ -331,15 +331,15 @@ void LoadImage(Rect *rect, unsigned long *p)
 
     wait_gpu;
 
-    gp1 = 0x01000000; // reset the command queue
-    GP_SendGPU0(0xa0000000); // send 'send image' primitive
-    GP_SendGPU0(vrampos); // send x and y coordinates
-    GP_SendGPU0(size); // send width and height
+    gp1 = 0x01000000; /* reset the command queue */
+    GP_SendGPU0(0xa0000000); /* send 'send image' primitive */
+    GP_SendGPU0(vrampos); /* send x and y coordinates */
+    GP_SendGPU0(size); /* send width and height */
 
     for (i = 0; i < size_in_words; i++)
         GP_SendGPU0(*(p + i));
 
-    gp1 = 0x01000000; // reset the command queue again
+    gp1 = 0x01000000; /* reset the command queue again */
 }
 
 void gpuMemToVram(TIMData* pTIM, unsigned long sizeInBytes)
@@ -350,15 +350,15 @@ void gpuMemToVram(TIMData* pTIM, unsigned long sizeInBytes)
 
     wait_gpu;
 
-    gp1 = 0x01000000; // reset the command queue
-    GP_SendGPU0(0xa0000000); // send 'send image' primitive
-    GP_SendGPU0(*(pp + 1)); // send x and y coordinates
-    GP_SendGPU0(*(pp + 2)); // send width and height
+    gp1 = 0x01000000; /* reset the command queue */
+    GP_SendGPU0(0xa0000000); /* send 'send image' primitive */
+    GP_SendGPU0(*(pp + 1)); /* send x and y coordinates */
+    GP_SendGPU0(*(pp + 2)); /* send width and height */
 
     for (i = 0; i < sizeInWords; i++)
         GP_SendGPU0(*(pp + 3 + i));
 
-    gp1 = 0x01000000; // reset the command queue again
+    gp1 = 0x01000000; /* reset the command queue again */
 }
 
 int gpuGetActiveBuffer(void)
@@ -399,115 +399,63 @@ void gpuSortLine(GpuLine* line)
 
 void gpuSortSprite(GpuSprite* sprite)
 {
-    //  int trans_on, trans_rate;
-    //  trans_rate = sprite->trans - 1;
-    //  if (trans_rate < 0)
-    //trans_on = 0;
-    //else
-    //    trans_on = 1 << 25;
-    //trans_rate = trans_rate << 5;
-    //ADD_PACKET (0) = (0xe1000200 | trans_rate | sprite->tpage);
-
     ADD_PACKET(0, (0xe1000200 | sprite->tpage));
-
-    //if ((sprite->rotate % ONE) | (sprite->scalex % ONE) | (sprite->scalex % ONE))
-    //    gpuSortSprite2(sprite);
-    //else
-    //{
-        ADD_PACKET(1, GPU_COM(0x64, sprite->r, sprite->g, sprite->b));
-        ADD_PACKET(2, H2L(sprite->x, sprite->y));
-        ADD_PACKET(3, HB2L(sprite->clutid, sprite->u, sprite->v));
-        ADD_PACKET(4, H2L(sprite->w, sprite->h));
-        NEXT_PACKET(5);
-    //}
+    ADD_PACKET(1, GPU_COM(0x64, sprite->r, sprite->g, sprite->b));
+    ADD_PACKET(2, H2L(sprite->x, sprite->y));
+    ADD_PACKET(3, HB2L(sprite->clutid, sprite->u, sprite->v));
+    ADD_PACKET(4, H2L(sprite->w, sprite->h));
+    NEXT_PACKET(5);
 }
 
-/*
-void gpuSortSprite2(GpuSprite *sprite)
+void gpuSortPoly3(GpuPoly3* poly)
 {
-    GsTPOLY4 poly;
-    long new_width, new_height;
-    long offset_x, offset_y;
-    long x0, y0, x1, y1, x2, y2, x3, y3;
-    long cxa, cxb, cya, cyb;
-    long sxa, sxb, sya, syb;
-    short rot_cos, rot_sin;
+    ADD_PACKET(0, 0xe1000200);
+    ADD_PACKET(1, GPU_COM(0x20, poly->r, poly->g, poly->b));
+    ADD_PACKET(2, H2L(poly->x0, poly->y0));
+    ADD_PACKET(3, H2L(poly->x1, poly->y1));
+    ADD_PACKET(4, H2L(poly->x2, poly->y2));
+    NEXT_PACKET(5);
+}
 
-    //int trans_on;
+void gpuSortGPoly3(GpuGPoly3* poly)
+{
+    ADD_PACKET(0, 0xe1000200);
+    ADD_PACKET(1, GPU_COM(0x30, poly->r0, poly->g0, poly->b0));
+    ADD_PACKET(2, H2L(poly->x0, poly->y0));
+    ADD_PACKET(3, GPU_COM(0x00, poly->r1, poly->g1, poly->b1));
+    ADD_PACKET(4, H2L(poly->x1, poly->y1));
+    ADD_PACKET(5, GPU_COM(0x00, poly->r2, poly->g2, poly->b2));
+    ADD_PACKET(6, H2L(poly->x2, poly->y2));
+    NEXT_PACKET(7);
+}
 
-    //if ((sprite->trans - 1) < 0)
-        //trans_on = 0;
-    //else
-        //trans_on = 1 << 25;
+void gpuSortTPoly3(GpuTPoly3* poly)
+{
+    ADD_PACKET(0, 0xe1000200);
+    ADD_PACKET(1, GPU_COM(0x24, poly->r, poly->g, poly->b));
+    ADD_PACKET(2, H2L(poly->x0, poly->y0));
+    ADD_PACKET(3, HB2L(poly->clutid, poly->u0, poly->v0));
+    ADD_PACKET(4, H2L(poly->x1, poly->y1));
+    ADD_PACKET(5, HB2L(poly->tpage, poly->u1, poly->v1));
+    ADD_PACKET(6, H2L(poly->x2, poly->y2));
+    ADD_PACKET(7, HB2L(0, poly->u2, poly->v2));
+    NEXT_PACKET(8);
+}
 
-    // To rotate around the centre, first calculate the x/y coords of the
-    // vertices as offsets from the centre.
-    // Scaling is multiplied up by 4096 (ONE), so to get 'on-screen' scaled size we divide
-    // again by 4096 ( >> 12).
-    // To get offset from the centre, width and height are halved ( >> 1), meaning we use
-    // a right-shift of 13 ( >> 13).
-    // ie. the 'scaled' width calculation can be written as:
-    // new_width = ((sprite->w * sprite->scalex) >> 12) / 2;
-
-    new_width = ((sprite->w *sprite->scalex) >> 13);
-    new_height = ((sprite->h *sprite->scaley) >> 13);
-    if ((new_width > 255) | (new_height > 255))
-        return;
-
-    if ((new_width <= 0) | (new_height <= 0))
-        return;
-
-    offset_x = sprite->x + (sprite->w >> 1);
-    offset_y = sprite->y + (sprite->h >> 1);
-
-    rot_cos = cos(sprite->rotate);
-    rot_sin = sin(sprite->rotate);
-
-    x0 = x2 = 0 - new_width;
-    y0 = y1 = 0 - new_height;
-    x1 = x3 = 0 + new_width;
-    y2 = y3 = 0 + new_height;
-
-    cxa = (x0 * rot_cos) >> 12;
-    sxa = (x0 * rot_sin) >> 12;
-    cya = (y0 * rot_cos) >> 12;
-    sya = (y0 * rot_sin) >> 12;
-
-    cxb = (x1 * rot_cos) >> 12;
-    sxb = (x1 * rot_sin) >> 12;
-    cyb = (y2 * rot_cos) >> 12;
-    syb = (y2 * rot_sin) >> 12;
-
-    poly.x0 = cxa - sya + offset_x;
-    poly.y0 = cya + sxa + offset_y;
-    poly.x1 = cxb - sya + offset_x;
-    poly.y1 = cya + sxb + offset_y;
-    poly.x2 = cxa - syb + offset_x;
-    poly.y2 = cyb + sxa + offset_y;
-    poly.x3 = cxb - syb + offset_x;
-    poly.y3 = cyb + sxb + offset_y;
-
-    poly.u1 = poly.u3 = sprite->u + sprite->w - 1;
-    poly.v2 = poly.v3 = sprite->v + sprite->h - 1;
-
-    if (poly.u1 > 255)
-        poly.u1 = poly.u3 = 255;
-
-    if (poly.v2 > 255)
-        poly.v2 = poly.v3 = 255;
-
-    ADD_PACKET(1, GPU_COM(0x2c, sprite->r, sprite->g, sprite->b));
-    ADD_PACKET(2, H2L(poly.x0, poly.y0));
-    ADD_PACKET(3, HB2L(sprite->clutid, sprite->u, sprite->v));
-    ADD_PACKET(4, H2L(poly.x1, poly.y1));
-    ADD_PACKET(5, HB2L(sprite->tpage, poly.u1, sprite->v));
-    ADD_PACKET(6, H2L(poly.x2, poly.y2));
-    ADD_PACKET(7, HB2L(0, sprite->u, poly.v2));
-    ADD_PACKET(8, H2L(poly.x3, poly.y3));
-    ADD_PACKET(9, HB2L(0, poly.u3, poly.v3));
+void gpuSortGTPoly3(GpuGTPoly3 *poly)
+{
+    ADD_PACKET(0, (0xe1000200));
+    ADD_PACKET(1, GPU_COM(0x34, poly->r0, poly->g0, poly->b0));
+    ADD_PACKET(2, H2L(poly->x0, poly->y0));
+    ADD_PACKET(3, HB2L(poly->clutid, poly->u0, poly->v0));
+    ADD_PACKET(4, GPU_COM(0x00, poly->r1, poly->g1, poly->b1));
+    ADD_PACKET(5, H2L(poly->x1, poly->y1));
+    ADD_PACKET(6, HB2L(poly->tpage, poly->u1, poly->v1));
+    ADD_PACKET(7, GPU_COM(0x00, poly->r2, poly->g2, poly->b2));
+    ADD_PACKET(8, H2L(poly->x2, poly->y2));
+    ADD_PACKET(9, HB2L(0, poly->u2, poly->v2));
     NEXT_PACKET(10);
 }
-*/
 
 void gpuDraw(unsigned long * pGP)
 {
@@ -526,7 +474,7 @@ void gpuDraw(unsigned long * pGP)
     }
     
     gp1 = (0x05000000 | (PSDOFSY[PSDCNT & 0x01] << 10) | PSDOFSX[PSDCNT & 0x01]);
-    *(__primQueue) = 0x00ffffff; // mark the end of the list
+    *(__primQueue) = 0x00ffffff; /* mark the end of the list */
     
     d_icr = 0;
     d2_madr = (unsigned long)pGP;
@@ -564,8 +512,10 @@ void object_quick_sort(int s, int e)
         
         while (l < r)
         {
-            // This quick sort is descending, so that the largest Z coordinate is drawn first.
-            // For an ascending sort, simply reverse the < > signs in the next 2 lines
+            /*
+             * This quick sort is descending, so that the largest Z coordinate is drawn first.
+             * For an ascending sort, simply reverse the < > signs in the next 2 lines 
+             */
             while ( (OBJECT_z[l] > g) && (l <= e) ) l++;
             while ( (OBJECT_z[r] < g) && (r >= s) ) r--;
 

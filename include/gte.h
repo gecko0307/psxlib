@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022-2025 Timur Gafarov
+Copyright (c) 2025 Timur Gafarov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,34 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-unsigned long pad_buf = 0;
-unsigned long pad_data = 0;
+#ifndef _GTE_H_
+#define _GTE_H_
 
-void padInit(void)
-{
-    pad_data = 0xffffffff;
-    pad_init(0x20000001, &pad_buf);
-}
+/* Implemented in gte.s */
+void gte_enable(void);
 
-unsigned long padRead(void)
-{
-    return (~pad_data);
-}
-
-unsigned long padRead2(void)
-{
-    return (~pad_data >> 16);
-}
-
-void padStop(void)
-{
-    pad_stop();
-}
-
-void padWaitVSync(void)
-{
-    volatile unsigned long *p = (volatile unsigned long *)&pad_buf;
-    *p = 0x0000;
-    while (*p == 0x0000) {};
-    pad_data = *p;
-}
+#endif

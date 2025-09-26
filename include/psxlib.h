@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 Timur Gafarov
+Copyright (c) 2022-2025 Timur Gafarov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ SOFTWARE.
 #define _PSXLIB_H_
 
 #include "gpu.h"
+#include "gte.h"
 #include "pad.h"
 #include "stdio.h"
 #include "types.h"
