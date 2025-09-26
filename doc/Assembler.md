@@ -1,4 +1,4 @@
-# ASPSX Assempler Guide
+# ASPSX Assembler Guide
 
 Built-in assembler that is used in CCPSX toolchain.
 
