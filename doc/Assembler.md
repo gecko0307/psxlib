@@ -63,9 +63,7 @@ Unlike most instructions, `mult` doesn't say where to store the result. The prod
 `mflo $4` - the lower part of the product
 `mfhi $5` - the upper part of the product
 
-Mathematically:
-
-$2 * $3 = ($5 << 32) | $4
+Mathematically: `$2 * $3 = ($5 << 32) | $4`
 
 - `div $a, $b` - Divide. `$a / $b`
 - `divu $a, $b` - Divide Unsigned. `$a / $b`
@@ -76,9 +74,7 @@ The result of division is stored separately as the quotient and the remainder. T
 `mflo $4` - the quotient of the division
 `mfhi $5` - the remainder of the division
 
-Mathematically:
-
-$2 / $3 = $4 + 1/$5
+Mathematically: `$2 / $3 = $4 + 1/$5`
 
 - `mflo $r` - Move From Low. Copy from the `lo` special register to the given destination register.
 - `mfhi $r` - Move From High. Copy from the `hi` special register to the given destination register.
