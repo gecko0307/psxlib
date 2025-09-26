@@ -257,7 +257,9 @@ COP0 registers:
 
 ## COP2 - GTE
 
-The GTE doesn't have any memory or I/O ports mapped to the CPU memory bus, instead, it's solely accessed via coprocessor opcodes (`cop2`). Before use, the GTE must be turned on. The GTE has bit 30 allocated to it in the status register of the system control coprocessor (`cop0`). Before any GTE instruction is used, this bit must be set:
+The GTE doesn't have any memory or I/O ports mapped to the CPU memory bus, instead, it's solely accessed via coprocessor opcodes (`cop2`).
+
+Before use, the GTE must be turned on. The GTE has bit 30 allocated to it in the status register of the system control coprocessor (`cop0`). Before any GTE instruction is used, this bit must be set:
 
 ```
 mfc0   $8, $12             # t0 = SR
@@ -266,8 +268,8 @@ mtc0   $8, $12             # SR = t0
 nop
 ```
 
-- `mtc2 $r, $d` - Move To Coprocessor 2. Writes a register value to the GTE data register. `$d = $r`
-- `mfc2 $r, $d` - Move From Coprocessor 2. Reads a value from the GTE register. `$r = $d`
+- `mtc2 $r, $d` - writes a register value to the GTE data register. `$d = $r`
+- `mfc2 $r, $d` - reads a value from the GTE register. `$r = $d`
 - `ctc2 $r, $c` - writes a value to the GTE control register. `$c = $r`
 - `cfc2 $r, $c` - reads a value from the GTE control register. `$r = $c`
 - `lwc2 $d, imm(base)` - stores a value at imm(base) in GTE data register gd.
