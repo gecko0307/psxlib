@@ -11,6 +11,8 @@ set GO32=DPMISTACK 1000000
 set G032TMP=C:\WINDOWS\TEMP
 set TMPDIR=C:\WINDOWS\TEMP
 
+ccpsx -c src\test.s -oobj\test.obj
+
 echo -- Building CPE...
 ccpsx -Xo$80010000 -O0 -I..\include -I..\src ..\src\sys.s ..\src\gte.s ..\src\pad.c ..\src\gpu.c src\cd.c src\test.s src\main.c -ocpe\main.cpe
 

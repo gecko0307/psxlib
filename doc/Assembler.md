@@ -11,8 +11,35 @@ Built-in assembler that is used in CCPSX toolchain.
 
 ## Directives
 
+### .rdata
+Starts read-only data section.
+
+```
+.rdata
+str:
+    .asciz "Hello, PSX!"
+```
+
 ### .text
 Starts the actual program code, sometimes called a "text segment" or "code segment".
+
+### .data
+Starts initialized data section. Contains global variables.
+
+### .sdata
+Starts small initialized data section.
+
+### .sbss
+Starts small uninitialized data section.
+
+### .bss
+Starts uninitialized data section.
+
+### .ctors
+Starts constructors section.
+
+### .dtors
+Starts destructors section.
 
 ### .global <symbol>
 Makes the following symbol visible to the linker. Otherwise, symbol is lost by link time. All symbols that should be available to the C code should be marked with `.global`.
@@ -212,17 +239,17 @@ if ($r < 0) {
 ### Pseudo-instructions:
 - `li $r, imm` - Load Immediate. Loads a register with a value that is immediately available.
 
-Expands into `lui` followed by `ori` if `imm` is larger than 16 bits:
+If `imm` is larger than 16 bits, expands into `lui` followed by `ori`:
 
 ```
-lui $1, (imm & 0xffff)
-ori $r, $1, (imm >> 16)
+lui $r, (imm & 0xffff)
+ori $r, $r, (imm >> 16)
 ```
 
-If `imm` is unsigned and fits into 16-bit, expands into single `ori`:
+If `imm` is unsigned and fits into 16-bit, expands into single `lui`:
 
 ```
-ori $r, $0, imm
+lui $r, $0, imm
 ```
 
 If `imm` is signed and fits into 16-bit, expands into single `addiu` with zero first operand:

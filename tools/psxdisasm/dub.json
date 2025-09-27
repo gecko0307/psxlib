@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"Timur Gafarov"
+	],
+	"copyright": "Copyright © 2025, Timur Gafarov",
+	"description": "PsyQ LINK object code disassembler",
+	"license": "BSL-1.0",
+	"name": "psxdisasm"
+}

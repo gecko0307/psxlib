@@ -1,3 +1,7 @@
+.rdata
+str:
+    .asciz "Hello, PSX!"
+
 .text
 .global gte_rtps_test
 
@@ -39,9 +43,9 @@ gte_rtps_test:
     ctc2    $0, $28            # DQB = 0
     
     # OFX/OFY (1.0 = 0x10000)
-    li      $8, 0x1400000            # OFX = 320
+    li      $8, 0x1400000      # OFX = 320
     ctc2    $8, $24
-    li      $8, 0xF00000             # OFY = 240
+    li      $8, 0xF00000       # OFY = 240
     ctc2    $8, $25
     
     # V0 = (1.0, 1.0, 1.0)
