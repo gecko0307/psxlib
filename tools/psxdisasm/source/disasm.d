@@ -3,85 +3,126 @@ module disasm;
 import std.stdio;
 import mips;
 
-void disasmMIPSCode(uint[] data)
+class MipsDisassembler
 {
-    foreach(instr; data)
+    public:
+    
+    this(uint[] text)
+    {
+        this.text = text;
+        disassemble();
+    }
+    
+    protected:
+    
+    uint[] text;
+    
+    void disassemble()
+    {
+        foreach(uint instr; text)
+        {
+            disasmInstruction(instr);
+        }
+    }
+    
+    void disasmInstruction(uint instr)
     {
         ubyte opcode = cast(ubyte)(instr >> 26);
+        
         if (opcode == 0) // R-type
-        {
-            ubyte funct = cast(ubyte)(instr & 0x3f);
-            ubyte rs    = cast(ubyte)((instr >> 21) & 0x1f);
-            ubyte rt    = cast(ubyte)((instr >> 16) & 0x1f);
-            ubyte rd    = cast(ubyte)((instr >> 11) & 0x1f);
-            ubyte shift = cast(ubyte)((instr >> 6)  & 0x1f);
-            
-            if (funct == MipsRType.JR)
-            {
-                writefln("  0x%08x: %s $%s", instr, cast(MipsRType)funct, rs);
-            }
-            else
-            {
-                if (funct == MipsRType.SLL && rs == 0 && rt == 0 && rd == 0 && shift == 0)
-                {
-                    writefln("  0x%08x: NOP", instr);
-                }
-                else
-                {
-                    writefln("  0x%08x: %s $%s, $%s, %d($%s)", instr, cast(MipsRType)funct, rd, rs, shift, rt);
-                }
-            }
-        }
+            disasmRType(instr);
         else if (opcode == MipsInstr.J || opcode == MipsInstr.JAL)
-        {
-            uint target = instr & 0x03ffffff;
-            writefln("  0x%08x: %s 0x%08x", instr, cast(MipsInstr)opcode, target);
-        }
+            disasmJump(instr);
         else if (opcode == MipsInstr.COP0)
-        {
-            ubyte op = cast(ubyte)((instr >> 21) & 0x1f);
-            if (op == MipsCop0.MTC0 || op == MipsCop0.MFC0)
-            {
-                ubyte rt = cast(ubyte)((instr >> 16) & 0x1f);
-                ubyte rd = cast(ubyte)((instr >> 11) & 0x1f);
-                
-                writefln("  0x%08x: %s $%s, $%s", instr, cast(MipsCop0)op, rt, rd);
-            }
-            else
-            {
-                writefln("  0x%08x: %s", instr, cast(MipsInstr)opcode);
-            }
-        }
+            disasmCOP0(instr);
         else if (opcode == MipsInstr.COP2)
+            disasmCOP2(instr);
+        else // I-type
+            disasmIType(instr);
+    }
+    
+    // TODO: use separate disasm function for each r-type instruction
+    void disasmRType(uint instr)
+    {
+        ubyte funct = cast(ubyte)(instr & 0x3f);
+        ubyte rs    = cast(ubyte)((instr >> 21) & 0x1f);
+        ubyte rt    = cast(ubyte)((instr >> 16) & 0x1f);
+        ubyte rd    = cast(ubyte)((instr >> 11) & 0x1f);
+        ubyte shift = cast(ubyte)((instr >> 6)  & 0x1f);
+        
+        if (funct == MipsRType.JR)
         {
-            ubyte op = cast(ubyte)((instr >> 21) & 0x1f);
-            if (op == MipsCop2.MTC2 || op == MipsCop2.MFC2 ||
-                op == MipsCop2.CTC2 || op == MipsCop2.CFC2)
+            writefln("  0x%08x: %s $%s", instr, cast(MipsRType)funct, rs);
+        }
+        else
+        {
+            if (funct == MipsRType.SLL && rs == 0 && rt == 0 && rd == 0 && shift == 0)
             {
-                ubyte rt = cast(ubyte)((instr >> 16) & 0x1f);
-                ubyte rd = cast(ubyte)((instr >> 11) & 0x1f);
-                
-                writefln("  0x%08x: %s $%s, $%s", instr, cast(MipsCop2)op, rt, rd);
+                writefln("  0x%08x: NOP", instr);
             }
             else
             {
-                writefln("  0x%08x: %s", instr, cast(MipsInstr)opcode);
+                writefln("  0x%08x: %s $%s, $%s, %d($%s)", instr, cast(MipsRType)funct, rd, rs, shift, rt);
             }
         }
-        else // I-type
+    }
+    
+    void disasmIType(uint instr)
+    {
+        ubyte opcode = cast(ubyte)(instr >> 26);
+        ubyte rs    = cast(ubyte)((instr >> 21) & 0x1f);
+        ubyte rt    = cast(ubyte)((instr >> 16) & 0x1f);
+        short imm   = cast(short)(instr & 0xffff);
+        
+        if (opcode == MipsInstr.LUI)
         {
-            ubyte rs    = cast(ubyte)((instr >> 21) & 0x1f);
-            ubyte rt    = cast(ubyte)((instr >> 16) & 0x1f);
-            short imm   = cast(short)(instr & 0xffff);
+            writefln("  0x%08x: %s $%s, 0x%04x", instr, cast(MipsInstr)opcode, rt, imm);
+        }
+        else
+        {
+            writefln("  0x%08x: %s $%s, $%s, 0x%04x", instr, cast(MipsInstr)opcode, rt, rs, imm);
+        }
+    }
+    
+    void disasmJump(uint instr)
+    {
+        ubyte opcode = cast(ubyte)(instr >> 26);
+        uint target = instr & 0x03ffffff;
+        writefln("  0x%08x: %s 0x%08x", instr, cast(MipsInstr)opcode, target);
+    }
+    
+    void disasmCOP0(uint instr)
+    {
+        ubyte op = cast(ubyte)((instr >> 21) & 0x1f);
+        
+        if (op == MipsCop0.MTC0 || op == MipsCop0.MFC0)
+        {
+            ubyte rt = cast(ubyte)((instr >> 16) & 0x1f);
+            ubyte rd = cast(ubyte)((instr >> 11) & 0x1f);
             
-            if (opcode == MipsInstr.LUI)
-            {
-                writefln("  0x%08x: %s $%s, 0x%04x", instr, cast(MipsInstr)opcode, rt, imm);
-            }
-            else
-            {
-                writefln("  0x%08x: %s $%s, $%s, 0x%04x", instr, cast(MipsInstr)opcode, rt, rs, imm);
-            }
+            writefln("  0x%08x: %s $%s, $%s", instr, cast(MipsCop0)op, rt, rd);
+        }
+        else
+        {
+            writefln("  0x%08x: %s", instr, MipsInstr.COP0);
+        }
+    }
+    
+    void disasmCOP2(uint instr)
+    {
+        ubyte op = cast(ubyte)((instr >> 21) & 0x1f);
+        
+        if (op == MipsCop2.MTC2 || op == MipsCop2.MFC2 ||
+            op == MipsCop2.CTC2 || op == MipsCop2.CFC2)
+        {
+            ubyte rt = cast(ubyte)((instr >> 16) & 0x1f);
+            ubyte rd = cast(ubyte)((instr >> 11) & 0x1f);
+            
+            writefln("  0x%08x: %s $%s, $%s", instr, cast(MipsCop2)op, rt, rd);
+        }
+        else
+        {
+            writefln("  0x%08x: %s", instr, MipsInstr.COP2);
         }
     }
 }

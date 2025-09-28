@@ -61,7 +61,7 @@ int main(void)
     float animTimer = 0.0f;
     unsigned long padBtn;
     int gteResult;
-    short sx, sy;
+    short sx, sy, r;
     float fsx, fsy;
     
     GpuImage img;
@@ -98,6 +98,16 @@ int main(void)
     sy = (gteResult >> 16) & 0xFFFF; // Screen Y
     printf("SX = %hi\n", sx);
     printf("SY = %hi\n", sy);
+    
+    sx = 0x0800; // 0.5
+    sy = 0x2000; // 2.0
+    r = (short)(((int)sx * (int)sy) >> 12); // 0x1000 = 1.0
+    printf("Div = 0x%04X\n", r);
+    
+    sx = 0x2000; // 2.0
+    sy = 0x4000; // 4.0
+    r = (short)(((int)sx << 12) / (int)sy); // 0x0800 = 0.5
+    printf("Mult = 0x%04X\n", r);
     
     while(1)
     {
