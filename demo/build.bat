@@ -15,7 +15,7 @@ ccpsx -c src\test.s -oobj\test.obj
 ccpsx -c ..\src\gte.s -oobj\gte.obj
 
 echo -- Building CPE...
-ccpsx -Xo$80010000 -O0 -I..\include -I..\src ..\src\sys.s ..\src\gte.s ..\src\pad.c ..\src\gpu.c src\cd.c src\test.s src\main.c -ocpe\main.cpe
+ccpsx -Xo$80010000 -O0 -I..\include -I..\src ..\src\bios.s ..\src\gte.s ..\src\pad.c ..\src\gpu.c src\cd.c src\test.s src\main.c -ocpe\main.cpe
 
 echo -- Converting to PSX EXE...
 cpe2psx cpe/main.cpe iso/PSX.EXE

@@ -50,8 +50,27 @@ int spriteFromImage(GpuSprite* s, GpuImage* img, int x, int y, int u, int v, int
     return 0;
 }
 
-// Just a little test, tinkering with GTE
-int gte_rtps_test(void);
+// Identity matrix 3x3
+Mat3 rotation = {
+    0x1000, 0x0000, 0x0000,
+    0x0000, 0x1000, 0x0000,
+    0x0000, 0x0000, 0x1000
+};
+
+// Zero translation
+Trans translation = {0, 0, 0};
+
+// Vertex
+Vertex vertex = {0, 0, 0};
+
+// Projection params
+Proj projection = PROJ(
+    512,           // H = 512
+    0x10000 * 160, // OFX (1.0 = 0x10000)
+    0x10000 * 128, // OFY (1.0 = 0x10000)
+    0x100,         // DQA (1.0 = 0x100) = 1.0
+    0              // DQB (1.0 = 0x1000000) = 0.0
+);
 
 int main(void)
 {
@@ -63,6 +82,7 @@ int main(void)
     int gteResult;
     short sx, sy, r;
     float fsx, fsy;
+    int x, y, res;
     
     GpuImage img;
     GpuSprite sprite;
@@ -92,6 +112,15 @@ int main(void)
     printf("numFrames: %d\n", numFrames);
     
     gte_enable();
+    
+    gteResult = gte_rtps2(&rotation, &translation, &vertex, &projection);
+    printf("gteResult = 0x%08X\n", gteResult);
+    sx = gteResult & 0xFFFF;         // Screen X
+    sy = (gteResult >> 16) & 0xFFFF; // Screen Y
+    printf("SX = %hi\n", sx);
+    printf("SY = %hi\n", sy);
+    
+    /*
     gteResult = gte_rtps_test();
     printf("gteResult = 0x%08X\n", gteResult);
     sx = gteResult & 0xFFFF;         // Screen X
@@ -108,6 +137,12 @@ int main(void)
     sy = 0x4000; // 4.0
     r = (short)(((int)sx << 12) / (int)sy); // 0x0800 = 0.5
     printf("Mult = 0x%04X\n", r);
+    
+    x = 0x20000; // 0.5
+    y = 0x40000; // 2.0
+    res = (x << 16) / y; // 0x08000 = 1.0
+    printf("res = %i\n", res);
+    */
     
     while(1)
     {
