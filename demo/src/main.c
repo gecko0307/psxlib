@@ -50,27 +50,26 @@ int spriteFromImage(GpuSprite* s, GpuImage* img, int x, int y, int u, int v, int
     return 0;
 }
 
-// Identity matrix 3x3
-Mat3 rotation = {
-    0x1000, 0x0000, 0x0000,
-    0x0000, 0x1000, 0x0000,
-    0x0000, 0x0000, 0x1000
+// Vertex
+Vertex vertex1 = {0,   0,  0};
+Vertex vertex2 = {32,  0,  0};
+Vertex vertex3 = {0,  32,  0};
+
+RTPSTransform rtpsTransform = {
+    0, 0, 0,
+    {
+        F_ONE,  0x0000, 0x0000,
+        0x0000, F_ONE,  0x0000,
+        0x0000, 0x0000, F_ONE
+    },
+    512,
+    0x10000 * 160, // half screen width
+    0x10000 * 128, // half screen height
+    F_ONE,
+    0x0000
 };
 
-// Zero translation
-Trans translation = {0, 0, 0};
-
-// Vertex
-Vertex vertex = {0, 0, 0};
-
-// Projection params
-Proj projection = PROJ(
-    512,           // H = 512
-    0x10000 * 160, // OFX (1.0 = 0x10000)
-    0x10000 * 128, // OFY (1.0 = 0x10000)
-    0x100,         // DQA (1.0 = 0x100) = 1.0
-    0              // DQB (1.0 = 0x1000000) = 0.0
-);
+SVertex svertex = {0, 0, 0};
 
 int main(void)
 {
@@ -79,8 +78,8 @@ int main(void)
     int numFrames = 6;
     float animTimer = 0.0f;
     unsigned long padBtn;
-    int gteResult;
-    short sx, sy, r;
+    short test;
+    short sx, sy, sz;
     float fsx, fsy;
     int x, y, res;
     
@@ -93,7 +92,7 @@ int main(void)
     poly.g = 255;
     poly.b = 255;
     poly.p = 255;
-    poly.x0 = 0; poly.y0 = 0;
+    poly.x0 = 0;  poly.y0 = 0;
     poly.x1 = 32; poly.y1 = 0;
     poly.x2 = 32; poly.y2 = 32;
     poly.trans = 255;
@@ -111,14 +110,19 @@ int main(void)
     
     printf("numFrames: %d\n", numFrames);
     
-    gte_enable();
+    gteEnable();
     
-    gteResult = gte_rtps2(&rotation, &translation, &vertex, &projection);
-    printf("gteResult = 0x%08X\n", gteResult);
-    sx = gteResult & 0xFFFF;         // Screen X
-    sy = (gteResult >> 16) & 0xFFFF; // Screen Y
-    printf("SX = %hi\n", sx);
-    printf("SY = %hi\n", sy);
+    gteRTPS(&rtpsTransform, &vertex1, &svertex);
+    poly.x0 = svertex.x; poly.y0 = svertex.y;
+    printf("%hi, %hi\n", svertex.x, svertex.y);
+    
+    gteRTPS(&rtpsTransform, &vertex2, &svertex);
+    poly.x1 = svertex.x; poly.y1 = svertex.y;
+    printf("%hi, %hi\n", svertex.x, svertex.y);
+    
+    gteRTPS(&rtpsTransform, &vertex3, &svertex);
+    poly.x2 = svertex.x; poly.y2 = svertex.y;
+    printf("%hi, %hi\n", svertex.x, svertex.y);
     
     /*
     gteResult = gte_rtps_test();
@@ -173,7 +177,18 @@ int main(void)
         
         sprite.u = 32 * frame;
         gpuSortSprite(&sprite);
-        //gpuSortPoly3(&poly);
+        
+        rtpsTransform.tz += 1;
+        
+        gteRTPS(&rtpsTransform, &vertex1, &svertex);
+        poly.x0 = svertex.x; poly.y0 = svertex.y;
+        gteRTPS(&rtpsTransform, &vertex2, &svertex);
+        poly.x1 = svertex.x; poly.y1 = svertex.y;
+        gteRTPS(&rtpsTransform, &vertex3, &svertex);
+        poly.x2 = svertex.x; poly.y2 = svertex.y;
+        
+        gpuSortPoly3(&poly);
+        
         gpuSwapBuffers();
         gpuDraw((unsigned long*)&orderingTable[activeBuffer][0]);
         padWaitVSync();

@@ -25,7 +25,38 @@ SOFTWARE.
 #ifndef _GTE_H_
 #define _GTE_H_
 
-/* Implemented in gte.s */
-void gte_enable(void);
+#define F_ONE 0x1000
+
+/* Vector of three 16-bit elements */
+typedef struct
+{
+    short x, y, z, __padding;
+}
+Vertex;
+
+/* Screen-space vector of three 16-bit elements */
+typedef struct
+{
+    short x, y;
+    unsigned short z;
+    short __padding;
+}
+SVertex;
+
+/* Rotate/translate/perspective transform */
+typedef struct
+{
+    long tx, ty, tz; /* translation, bytes 0..12 */
+    short r[9];      /* 3x3 rotation matrix of Q3.12 elements, bytes 14.. */
+    short h;
+    long ofx, ofy;
+    short dqa, dqb;
+} RTPSTransform;
+
+/* Enables the GTE. Should be called once at the start of the game */
+void gteEnable(void);
+
+/* Transforms a vertex and brings it to the screen space */
+void gteRTPS(RTPSTransform* rtpsTransform, Vertex* inVertex, SVertex* outVertex);
 
 #endif

@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include "gpu.h"
 #include "gte.h"
-#include "geom.h"
 #include "pad.h"
 #include "stdio.h"
 #include "types.h"

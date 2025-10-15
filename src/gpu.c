@@ -55,8 +55,8 @@ unsigned long PSDCNT = 0; /* frame switch counter */
 unsigned long PSDOFSX[2]; /* double buffer x coords */
 unsigned long PSDOFSY[2]; /* double buffer y coords */
 
-unsigned long __primQueueLength = 0; /* length of primitive queue */
-unsigned long * __primQueue = NULL; /* pointer to primitive queue */
+unsigned long  __primQueueLength = 0; /* length of primitive queue */
+unsigned long* __primQueue = NULL; /* pointer to primitive queue */
 
 GpuImage __font[10];
 unsigned long __fontColor[10];
@@ -64,12 +64,12 @@ unsigned char __fontWidth[10];
 unsigned char __fontHeight[10];
 unsigned char __stringBuffer[128];
 
-unsigned long OBJECT_number = 0;
-unsigned long OBJECT_z[1024];
-unsigned long * OBJECT_prev;
-unsigned long * OBJECT_first;
-unsigned long * OBJECT_start[1024];
-unsigned long * OBJECT_end[1024];
+unsigned long  OBJECT_number = 0;
+unsigned long  OBJECT_z[1024];
+unsigned long* OBJECT_prev;
+unsigned long* OBJECT_first;
+unsigned long* OBJECT_start[1024];
+unsigned long* OBJECT_end[1024];
 
 static inline void ADD_PACKET(int num, unsigned long data)
 {
@@ -442,7 +442,7 @@ void gpuSortTPoly3(GpuTPoly3* poly)
     NEXT_PACKET(8);
 }
 
-void gpuSortGTPoly3(GpuGTPoly3 *poly)
+void gpuSortGTPoly3(GpuGTPoly3* poly)
 {
     ADD_PACKET(0, (0xe1000200));
     ADD_PACKET(1, GPU_COM(0x34, poly->r0, poly->g0, poly->b0));
@@ -457,7 +457,21 @@ void gpuSortGTPoly3(GpuGTPoly3 *poly)
     NEXT_PACKET(10);
 }
 
-void gpuDraw(unsigned long * pGP)
+/*
+void GsSortObject(GsObject* object)
+{
+    OBJECT_start[OBJECT_number] = __primQueue;
+    if (OBJECT_number == 0)
+        OBJECT_first = OBJECT_prev;
+    
+    // store the projected z value
+    OBJECT_z[OBJECT_number] = GsSortObject2(object);
+    OBJECT_end[OBJECT_number] = OBJECT_prev;
+    OBJECT_number++;
+}
+*/
+
+void gpuDraw(unsigned long* pGP)
 {
     int i;
     unsigned long *OBJECT_last;
