@@ -4,6 +4,8 @@ PSXLib is a library for homebrew PlayStation 1 development. This project aims to
 
 PSXLib doesn't provide its own MIPS toolchain though, it is meant to be used with Psy-Q CCPSX compiler and corresponding tools.
 
+-- Note: development of PSXLib is discontinued in favor of [Retrolang](https://github.com/gecko0307/retrolang), a full-fledged independent toolchain for PlayStation. It is partly based on PSXLib code.
+
 ## Features
 
 Currently PSXLib contains only the most basic functionality:
